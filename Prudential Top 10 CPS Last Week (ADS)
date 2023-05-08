@@ -1,0 +1,5 @@
+index="policyguru_data" resourceId="enum*" NOT disposition.disposition="*"
+| eval timestampStr_text = strftime(timestamp/1000, "%Y-%m-%d %H:%M:%S")
+| stats count by timestampStr_text
+| sort -count timestampStr_text
+| head 10

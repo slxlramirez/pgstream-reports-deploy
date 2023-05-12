@@ -1,0 +1,11 @@
+index="policyguru_data" resourceId="enum*"
+| rex field=meta "direction:(?<direction>.*)"
+| search direction="INBOUND"
+| lookup pg_directory_listings.csv number AS "connections{}.left.facets{}.number" OUTPUT lists
+| fillnull value="No List Match" lists
+| search lists != "*Whitelist*" AND lists != "*Graylist*"
+| rename connections{}.left.facets{}.number as sourcenumber
+| eval sourcenumber=mvdedup(sourcenumber)
+| bin _time span=15m
+| stats count by sourcenumber _time
+| search count > 200

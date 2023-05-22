@@ -1,0 +1,33 @@
+index="policyguru_data" resourceId="enum*" [
+search index="policyguru_data" resourceId="enum*" "INBOUND"
+ [ | inputlookup pg_directory_listings.csv where lists="Negative_Value_Call_List_HCL" | fields number | rename number as "connections{}.left.facets{}.number" | format ]
+| stats values(*) as * by guid
+| stats count by guid
+| fields guid
+]
+| stats values(*) as * by guid
+| eval timestamp = mvindex(timestamp, 0)
+| eval _time=(timestamp/1000)
+| rename disposition.disposition as disposition
+id as policyrule
+modalities{}.modality as calltype
+connections{}.left.facets{}.country as sourcecountry
+connections{}.left.facets{}.number as sourcenumber
+connections{}.right.facets{}.country as destinationcountry
+connections{}.right.facets{}.number as destinationnumber
+resourceId as routername
+| rex field=meta "direction:(?<direction>.*)"
+| table
+_time
+guid
+timestamp 
+direction
+routername
+calltype
+sourcenumber
+sourcecountry
+destinationnumber
+destinationcountry
+policyrule
+disposition
+| sort _time

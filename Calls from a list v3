@@ -1,7 +1,6 @@
 index="policyguru_data" resourceId="enum*" [
 search index="policyguru_data" resourceId="enum*" "INBOUND"
  [ | inputlookup pg_directory_listings.csv where lists="Negative_Value_Call_List_HCL" | fields number | rename number as "connections{}.left.facets{}.number" | format ]
-| stats values(*) as * by guid
 | stats count by guid
 | fields guid
 ]

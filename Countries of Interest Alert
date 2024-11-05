@@ -1,0 +1,55 @@
+
+index="policyguru_data" resourceId="enum*" "INBOUND" "connections{}.left.facets{}.number" IN ("+1800*", "+1833*")
+| table
+_time timestamp timestampStr
+state.state
+state.stateEnum
+source
+resourceId
+meta
+guid
+modalities{}.modality
+connections{}.right.facets{}.cc
+connections{}.right.facets{}.xc
+connections{}.right.facets{}.region
+connections{}.right.facets{}.rc
+connections{}.right.facets{}.country
+connections{}.right.facets{}.number
+connections{}.left.facets{}.cc
+connections{}.left.facets{}.xc
+connections{}.left.facets{}.region
+connections{}.left.facets{}.rc
+connections{}.left.facets{}.country
+connections{}.left.facets{}.number
+| rename
+state.state as state
+state.stateEnum as enum_state
+resourceId as routername
+modalities{}.modality as call_type
+connections{}.left.facets{}.cc as source_cc
+connections{}.left.facets{}.xc as source_xc
+connections{}.left.facets{}.region as source_region
+connections{}.left.facets{}.rc as source_rc
+connections{}.left.facets{}.country as source_country
+connections{}.left.facets{}.number as sourcenumber
+connections{}.right.facets{}.cc as destination_cc
+connections{}.right.facets{}.xc as desination_xc
+connections{}.right.facets{}.region as destination_region
+connections{}.right.facets{}.rc as destination_rc
+connections{}.right.facets{}.country as destination_country
+connections{}.right.facets{}.number as destination_number
+| eval source_cc=mvdedup(source_cc)
+| eval source_xc=mvdedup(source_xc)
+| eval source_region=mvdedup(source_region)
+| eval source_rc=mvdedup(source_rc)
+| eval source_country=mvdedup(source_country)
+| eval sourcenumber=mvdedup(sourcenumber)
+| eval destination_cc=mvdedup(destination_cc)
+| eval desination_xc=mvdedup(desination_xc)
+| eval destination_region=mvdedup(destination_region)
+| eval destination_rc=mvdedup(destination_rc)
+| eval destination_country=mvdedup(destination_country)
+| eval destination_number=mvdedup(destination_number)
+| rex field=meta "direction:(?<direction>.*)"
+| fields - meta
+| table *
